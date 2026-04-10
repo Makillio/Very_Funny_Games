@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="game-board"></div>
+  <div class="controls">
+    <div>Score: <span id="score">1</span></div>
+    <div>
+      <button id="btn-up">▲</button><br>
+      <button id="btn-left">◀</button>
+      <button id="btn-down">▼</button>
+      <button id="btn-right">▶</button>
+    </div>
+    <div>
+		Скорость (мс): <input type="range" id="speed-range" min="100" max="1500" value="800" step="50">
+		<span id="speed-value">800</span>
+	</div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
