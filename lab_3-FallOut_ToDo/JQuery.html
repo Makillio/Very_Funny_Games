@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Список задач - Vault-Tec Terminal (jQuery)</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Share Tech Mono', 'Courier New', monospace;
+        background: radial-gradient(ellipse at center, #0a3f1f 0%, #051a0a 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 255, 0, 0.03) 0px,
+          rgba(0, 255, 0, 0.03) 2px,
+          transparent 2px,
+          transparent 4px
+        );
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.4) 100%);
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .box {
+        background: #0a0c0b;
+        border: 2px solid #2d8c3c;
+        border-radius: 8px;
+        box-shadow: 
+          0 0 20px rgba(45, 140, 60, 0.3),
+          inset 0 0 10px rgba(45, 140, 60, 0.1),
+          0 10px 30px rgba(0,0,0,0.5);
+        width: 650px;
+        max-width: 100%;
+        position: relative;
+        z-index: 2;
+      }
+
+      .top {
+        background: linear-gradient(135deg, #1a3a1a 0%, #0a1a0a 100%);
+        padding: 12px 16px;
+        border-bottom: 1px solid #2d8c3c;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 6px 6px 0 0;
+      }
+
+      .title {
+        color: #2d8c3c;
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-shadow: 0 0 5px #2d8c3c;
+      }
+
+      .title::before {
+        content: "> ";
+        color: #4afc4a;
+      }
+
+      .badge {
+        color: #2d8c3c;
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
+
+      .main {
+        padding: 24px;
+        background: #0a0c0b;
+        border-radius: 0 0 6px 6px;
+      }
+
+      h1 {
+        color: #4afc4a;
+        font-size: 20px;
+        margin-bottom: 24px;
+        text-align: center;
+        letter-spacing: 3px;
+        text-shadow: 0 0 8px #4afc4a;
+        border-bottom: 1px solid #2d8c3c;
+        padding-bottom: 12px;
+        font-family: 'Share Tech Mono', monospace;
+      }
+
+      h1::before {
+        content: "[PIP-OS v6.2] ";
+        font-size: 12px;
+        color: #2d8c3c;
+        text-shadow: none;
+      }
+
+      .inputbox {
+        margin-bottom: 28px;
+        background: #050805;
+        padding: 16px;
+        border: 1px solid #1a4a1a;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .inputbox::before {
+        content: "$>";
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #4afc4a;
+        font-size: 14px;
+        opacity: 0.7;
+      }
+
+      .inp {
+        width: calc(100% - 90px);
+        background: transparent;
+        border: none;
+        color: #4afc4a;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 14px;
+        padding: 10px 10px 10px 28px;
+        outline: none;
+      }
+
+      .inp::placeholder {
+        color: #1a4a1a;
+        font-family: 'Share Tech Mono', monospace;
+      }
+
+      .btn {
+        background: #0a1a0a;
+        border: 1px solid #2d8c3c;
+        color: #4afc4a;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12px;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        letter-spacing: 1px;
+        margin-left: 8px;
+      }
+
+      .btn:hover {
+        background: #1a3a1a;
+        box-shadow: 0 0 8px rgba(45, 140, 60, 0.5);
+        text-shadow: 0 0 4px #4afc4a;
+      }
+
+      .list {
+        list-style-type: none;
+        margin-top: 8px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .list::-webkit-scrollbar {
+        width: 8px;
+        background: #050805;
+      }
+
+      .list::-webkit-scrollbar-track {
+        background: #050805;
+        border-left: 1px solid #1a4a1a;
+      }
+
+      .list::-webkit-scrollbar-thumb {
+        background: #2d8c3c;
+        border-radius: 4px;
+      }
+
+      .item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        margin: 4px 0;
+        border-left: 3px solid #2d8c3c;
+        background: #050805;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: 'Share Tech Mono', monospace;
+      }
+
+      .item:hover {
+        background: #0a120a;
+        border-left-color: #4afc4a;
+        box-shadow: inset 0 0 8px rgba(45, 140, 60, 0.2);
+      }
+
+      .item.done .text {
+        text-decoration: none;
+        color: #1a4a1a;
+        position: relative;
+      }
+
+      .item.done .text::before {
+        content: "[COMPLETED] ";
+        color: #2d8c3c;
+        font-size: 10px;
+        letter-spacing: 1px;
+      }
+
+      .item.done .text {
+        color: #1a6a2a;
+        text-decoration: line-through;
+        text-decoration-color: #2d8c3c;
+      }
+
+      .text {
+        flex: 1;
+        cursor: pointer;
+        color: #4afc4a;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+      }
+
+      .text::before {
+        content: "▪ ";
+        color: #2d8c3c;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 6px;
+      }
+
+      .edit, .del {
+        cursor: pointer;
+        background: #0a0c0b;
+        border: 1px solid #1a4a1a;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 3px;
+        transition: all 0.15s;
+        font-family: 'Share Tech Mono', monospace;
+      }
+
+      .edit {
+        color: #ffd700;
+      }
+
+      .edit:hover {
+        background: #3a3a0a;
+        border-color: #ffd700;
+        box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+        text-shadow: 0 0 3px #ffd700;
+      }
+
+      .del {
+        color: #ff4444;
+      }
+
+      .del:hover {
+        background: #3a0a0a;
+        border-color: #ff4444;
+        box-shadow: 0 0 6px rgba(255, 68, 68, 0.3);
+        text-shadow: 0 0 3px #ff4444;
+      }
+
+      .footer {
+        margin-top: 20px;
+        padding-top: 12px;
+        border-top: 1px solid #1a4a1a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: #2d8c3c;
+        font-family: 'Share Tech Mono', monospace;
+        position: relative;
+      }
+
+      .left {
+        color: #2d8c3c;
+      }
+
+      .mid {
+        color: #4afc4a;
+        font-size: 10px;
+      }
+
+      .right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #2d8c3c;
+      }
+
+      .footer span {
+        color: #4afc4a;
+      }
+
+      .blink {
+        display: inline-block;
+        width: 8px;
+        height: 14px;
+        background: #4afc4a;
+        animation: blink 1s infinite;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+
+      .light {
+        width: 8px;
+        height: 8px;
+        background: #4afc4a;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+        box-shadow: 0 0 6px #4afc4a;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
+      form {
+        margin-bottom: 0;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="box">
+      <div class="top">
+        <div class="title">
+          <span class="light"></span>
+          VAULT-TEC TERMINAL v6.2
+        </div>
+        <div class="badge">
+          [PIP-OS]
+        </div>
+      </div>
+      <div class="main">
+        <h1>ЗАДАЧИ ЖИТЕЛЯ УБЕЖИЩА</h1>
+        
+        <div class="inputbox">
+          <form id="myform">
+            <input type="text" id="what" class="inp" placeholder="ВВЕДИТЕ ЗАДАЧУ..." />
+            <button id="add" class="btn">ЗАГРУЗИТЬ</button>
+          </form>
+        </div>
+        
+        <ul id="list" class="list"></ul>
+        
+        <div class="footer">
+          <div class="left">VAULT-TEC INDUSTRIES</div>
+          <div class="mid" id="info">ЗАДАЧИ: 0/0 | АКТИВНО: 0</div>
+          <div class="right">ONLINE <span class="blink"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let items = [];
+
+      function showInfo() {
+        let total = items.length;
+        let done = 0;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].done) done++;
+        }
+        let active = total - done;
+        $('#info').html('ЗАДАЧИ: ' + done + '/' + total + ' | АКТИВНО: ' + active);
+      }
+
+      function drawAll() {
+        let $list = $('#list');
+        $list.empty();
+        
+        for (let i = 0; i < items.length; i++) {
+          let $item = $('<li class="item"></li>');
+          if (items[i].done) {
+            $item.addClass('done');
+          }
+          
+          let $txt = $('<span class="text"></span>').text(items[i].name);
+          let $wrap = $('<div class="buttons"></div>');
+          let $edit = $('<button class="edit">✏</button>');
+          let $del = $('<button class="del">🗑</button>');
+          
+          $wrap.append($edit, $del);
+          $item.append($txt, $wrap);
+          
+          $item.on('click', function(e) {
+            if ($(e.target).is('button')) return;
+            
+            items[i].done = !items[i].done;
+            $(this).toggleClass('done');
+            showInfo();
+          });
+          
+          $del.on('click', function(e) {
+            e.stopPropagation();
+            let sure = confirm('УДАЛИТЬ ЗАДАЧУ? [Y/N]');
+            if (sure) {
+              items.splice(i, 1);
+              drawAll();
+            }
+          });
+          
+          $edit.on('click', function(e) {
+            e.stopPropagation();
+            
+            let newName = prompt('ВВЕДИТЕ НОВОЕ НАЗВАНИЕ ЗАДАЧИ:', items[i].name);
+            if (newName !== null && newName.trim() !== '') {
+              items[i].name = newName.trim().toUpperCase();
+              drawAll();
+            }
+          });
+          
+          $list.append($item);
+        }
+        
+        showInfo();
+      }
+
+      function addOne() {
+        let val = $('#what').val();
+        if (val.trim() !== '') {
+          items.push({ name: val.trim().toUpperCase(), done: false });
+          $('#what').val('');
+          drawAll();
+        } else {
+          alert('ОШИБКА: НЕВОЗМОЖНО ДОБАВИТЬ ПУСТУЮ ЗАДАЧУ');
+        }
+      }
+
+      $('#myform').on('submit', function(e) {
+        e.preventDefault();
+        addOne();
+      });
+
+      $('#add').on('click', function(e) {
+        e.preventDefault();
+        addOne();
+      });
+
+      drawAll();
+    </script>
+  </body>
+</html>
